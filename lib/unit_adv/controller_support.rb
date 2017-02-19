@@ -1,4 +1,4 @@
-module UnitAdv::ControllerSupport
+module ControllerSupport
 
   attr_accessor :controller_obj, :stdout, :status
 

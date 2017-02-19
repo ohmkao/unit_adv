@@ -1,4 +1,4 @@
-module UnitAdv::Package
+module Package
 
   def add_file_by_taz(taz_file, add_files, path = tmp_dir)
     tar_file = taz_file.sub('.gz', '')

@@ -1,4 +1,4 @@
-class UnitAdv::EchoLog
+class EchoLog
 
   attr_accessor :log_file
 

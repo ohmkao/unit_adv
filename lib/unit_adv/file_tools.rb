@@ -1,4 +1,4 @@
-module UnitAdv::FileTools
+module FileTools
 
   def tmp_mkdir(init_tmp_dir = nil)
     self.tmp_dir = init_tmp_dir.present? ? init_tmp_dir : nil
