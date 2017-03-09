@@ -14,8 +14,8 @@ module ModuleUnit
 
     def initialize(*args)
       self.errors = []
-      init_args(args) # 初始化 args
       init_opts(args) # 初始化 opts (如果有的話)
+      init_args(args) # 初始化 args
       init_autoload # 自動載入
     end
 

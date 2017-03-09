@@ -1,6 +1,5 @@
 module ModuleUnit
   module MethodCall
-  #module UnitAdv::MethodCall
 
     # MethodCall 尋找變數順序
     DCALL_PRIORITY = %w(method const hash) unless const_defined?(:DCALL_PRIORITY)
