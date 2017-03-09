@@ -11,7 +11,7 @@ module ModuleUnit
     ARGS_IS_NIL_PASS = true unless const_defined?(:ARGS_IS_NIL_PASS)
 
     # assign args 是否要使用 RecursiveOpenStruct 結構
-    ARGS_IS_DATA_OBJECT = true
+    ARGS_IS_DATA_OBJECT = true unless const_defined?(:ARGS_IS_DATA_OBJECT)
 
     attr_accessor :args, :opts, :errors, :echo_log
 
