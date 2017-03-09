@@ -41,7 +41,7 @@ module ModuleUnit
       when "FalseClass" # return false : 作為錯誤，拋出 Exception
         raise Exception.new("Error: #{method_call}_by_#{k} (#{v})")
       when "NilClass" # return nil : 根據 ARGS_IS_NIL_PASS 視為 true or false
-        return [k, v] if ARGS_IS_NIL_PASS
+        return [k, v] if self.class::ARGS_IS_NIL_PASS
         raise Exception.new("Error: #{method_call}_by_#{k} (#{v})")
       when "TrueClass" # return true : 視為 正確，並自動將 v 一併回傳
         return [k, v]
