@@ -8,7 +8,10 @@ module ModuleUnit
     MAGIC_VARS = { "arg" => "args", "opt" => "opts" } unless const_defined?(:MAGIC_VARS)
 
     # init_args 如果回傳 nil 自動 pass
-    NIL_PASS_FOR_ARGS = true unless const_defined?(:NIL_PASS_FOR_ARGS)
+    ARGS_IS_NIL_PASS = true unless const_defined?(:ARGS_IS_NIL_PASS)
+
+    # assign args 是否要使用 RecursiveOpenStruct 結構
+    ARGS_IS_DATA_OBJECT = true
 
     attr_accessor :args, :opts, :errors, :echo_log
 
@@ -19,12 +22,16 @@ module ModuleUnit
       init_autoload # 自動載入
     end
 
+    def to_obj(data)
+      RecursiveOpenStruct.new(data, recurse_over_arrays: true)
+    end
+
     # === === ===
     # 初始化 參數 args
     def init_args(args)
-      self.args = ::RecursiveOpenStruct.new(
-          self.class::SET_ARGS.zip(args.slice(0..(self.class::SET_ARGS.size - 1))).each_with_object([]) { |(k, v), a| a << init_args_by(__method__, k, v) }.to_h, recurse_over_arrays: true
-        )
+      tmp_data = self.class::SET_ARGS.zip(args.slice(0..(self.class::SET_ARGS.size - 1))).each_with_object([]) { |(k, v), a| a << init_args_by(__method__, k, v) }.to_h
+
+      self.args = (self.class::ARGS_IS_DATA_OBJECT ? to_obj(tmp_data) : tmp_data )
     end
 
     # 自動呼叫對應的 method，並作回傳後的處理
@@ -33,8 +40,8 @@ module ModuleUnit
       case res.class.name
       when "FalseClass" # return false : 作為錯誤，拋出 Exception
         raise Exception.new("Error: #{method_call}_by_#{k} (#{v})")
-      when "NilClass" # return nil : 根據 NIL_PASS_FOR_ARGS 視為 true or false
-        return [k, v] if NIL_PASS_FOR_ARGS
+      when "NilClass" # return nil : 根據 ARGS_IS_NIL_PASS 視為 true or false
+        return [k, v] if ARGS_IS_NIL_PASS
         raise Exception.new("Error: #{method_call}_by_#{k} (#{v})")
       when "TrueClass" # return true : 視為 正確，並自動將 v 一併回傳
         return [k, v]
