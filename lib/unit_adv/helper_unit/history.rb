@@ -45,7 +45,7 @@ module UnitAdv
       end
 
       # === === ===
-      def save(data)
+      def save(data = nil)
         if data === false
           after(false)
         elsif data.present?
