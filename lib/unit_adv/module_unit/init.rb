@@ -32,7 +32,7 @@ module UnitAdv
       def init_args(args)
         tmp_data = self.class::SET_ARGS.zip(args.slice(0..(self.class::SET_ARGS.size - 1))).each_with_object([]) { |(k, v), a| a << init_args_by(__method__, k, v) }.to_h
 
-        self.args = (self.class::ARGS_IS_DATA_OBJECT ? to_obj(tmp_data) : tmp_data )
+        self.args = (self.class::ARGS_IS_DATA_OBJECT ? to_obj(tmp_data) : tmp_data.deep_symbolize_keys! )
       end
 
       # 自動呼叫對應的 method，並作回傳後的處理
