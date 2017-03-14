@@ -26,8 +26,8 @@ module UnitAdv
         end
 
         def self_controller_namelist(class_controller)
-          name_level = self.send(:controller_path).singularize.underscore.split('/')
-          name_level << self.send(:action_name)
+          name_level = class_controller.send(:controller_path).singularize.underscore.split('/')
+          name_level << class_controller.send(:action_name)
           name_level
         end
 

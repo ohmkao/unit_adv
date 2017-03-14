@@ -17,10 +17,19 @@ module UnitAdv
         call(nil, call_sym, *args, &block)
       end
 
-      def call(perfix, call_sym, *args, &block)
+      def call(perfix_set, call_sym, *args, &block)
+
+        if perfix_set.kind_of?(Hash)
+          perfix = perfix_set[:perfix]
+          dcall_priority = perfix_set[:dcall]
+        else
+          perfix = perfix_set
+        end
+        dcall_priority ||= self.class::DCALL_PRIORITY
+
         z = nil
         m = call_sym.kind_of?(Array) ? use_method_name(perfix, call_sym) : method_name(perfix, call_sym)
-        self.class::DCALL_PRIORITY.each do |r|
+        dcall_priority.each do |r|
           case r
           when 'method'
             z = send_method(m, *args, &block)
