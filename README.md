@@ -20,7 +20,14 @@ Or install it yourself as:
 
 ## Usage
 
-...
+```
+class ObjApple::Box
+  include UnitAdv::ModuleUnit::Klass
+  include UnitAdv::ModuleUnit::MethodCall
+  include UnitAdv::ModuleUnit::Init
+
+end
+```
 
 ## Development
 

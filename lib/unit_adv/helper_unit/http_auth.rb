@@ -1,3 +1,21 @@
+# ===
+# before_action :http_auth!
+#
+# def http_auth!
+#   return if UnitAdv::HelperUnit::HttpAuth.new(self, {
+#       auth_key_hash: Settings[:http_auth].try(:symbolize_keys),
+#       ip_whitelist: Settings[:ip_whitelist],
+#       skip_method_list: [
+#           /email_templates_\.?/,
+#           /auth_\.?/,
+#           /cfgsets_refresh/,
+#           /cfgsets_config_script/,
+#           /cfgsets_archive_package_name/,
+#           /cfgsets_archive_package_info/,
+#         ]
+#     }).perform
+# end
+
 module UnitAdv
   module HelperUnit
     class HttpAuth

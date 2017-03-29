@@ -35,7 +35,7 @@ module UnitAdv
             z = send_method(m, *args, &block)
             return z if call_sym.kind_of?(Array)
           when 'const'
-            z = const_get(call_sym)
+            z = const_get(call_sym) if const_defined?(call_sym.upcase.to_sym)
           when 'hash'
             z = hash_fetch(call_sym)
           end
