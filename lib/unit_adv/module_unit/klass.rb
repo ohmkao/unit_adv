@@ -32,12 +32,20 @@ module UnitAdv
         end
 
         # === === ===
-        def string_gsub(str, sub_data = nil)
-          return str if sub_data.nil?
-          h = [sub_data].zip([]).to_h if sub_data.kind_of?(String)
-          h = sub_data.zip([]).to_h if sub_data.kind_of?(Array)
-          h = sub_data if sub_data.kind_of?(Hash)
-          str.gsub(/[#{h.keys.join('|')}]/, h)
+        # str(String): Data String
+        # gsub_data(Hash): { key: OldString, value: NewString }
+        #
+        def string_gsub(str, gsub_data = nil)
+          return str if gsub_data.nil?
+          h = [gsub_data].zip([]).to_h if gsub_data.kind_of?(String)
+          h = gsub_data.zip([]).to_h if gsub_data.kind_of?(Array)
+          h = gsub_data if gsub_data.kind_of?(Hash)
+          str.gsub(Regexp.new("(#{h.keys.join('|')})"), h)
+        end
+
+        def to_arr(data, opts = nil)
+          return data if data.kind_of?(Array)
+          [data]
         end
 
         def to_level(arr, opts = {})
