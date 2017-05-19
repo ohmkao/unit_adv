@@ -74,10 +74,7 @@ module UnitAdv
         call(nil, call_sym, *args, &block)
       end
 
-<<<<<<< HEAD
-=======
       # === === ===
->>>>>>> develop
       def call(perfix_set, call_sym, *args, &block)
 
         if perfix_set.kind_of?(Hash)

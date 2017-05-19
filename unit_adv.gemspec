@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = %q{Class邏輯建構基礎}
   spec.description   = %q{用來快速建立基礎的邏輯結構}
-  spec.homepage      = "..."
+  spec.homepage      = "https://github.com/ohmkao/unit_adv"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
   # to allow pushing to a single host or delete this section to allow pushing to any host.
