@@ -13,9 +13,50 @@ module UnitAdv
 
       attr_accessor :opts
 
-      # === === ===
+      # === === === === === === === === ===
       # Detail:
-      #   呼叫 api 模式，以 api class，依序呼叫 method
+      #   依序叫出 class 的 initialize + perform
+      #
+      # Use:
+      #   class_names: [
+      #       "cat",
+      #       "dog",
+      #       ["pig", "kg", 5],
+      #       "sheep",
+      #       "chicken#perform_ex",
+      #     ]
+      #   opts: {
+      #     namespace: "animal"
+      #   }
+
+      def call_perform(class_names = [], opts = {}, &block)
+        opts[:namespace] ||= nil
+        opts[:need_initialize] ||= true
+        opts[:run_method] ||= "perform"
+
+        class_names.each_with_object({}) do |na, h|
+          if na.kind_of?(Array)
+            args = na[1..-1]
+            n = na[0]
+          else
+            n = na
+          end
+          nn ,run = n.split("#")
+
+          obj_name = opts[:namespace].present? ? "#{opts[:namespace]}/#{nn}" : nn
+          obj_c = obj_name.classify.constantize
+
+          # 需要 initialize
+          obj = opts[:need_initialize] ? obj_c.new : obj_c
+
+          res = obj.send(*([(run || opts[:run_method]).to_sym] + (args || [])))
+          h[nn.to_sym] = block_given? ? yield(nn, res, obj) : res
+        end
+      end
+
+      # === === === === === === === === ===
+      # Detail:
+      #   呼叫 api 模式，以 api class，在 class 內依序呼叫 method
       #
       # Use:
       #   use_api: {
@@ -38,7 +79,7 @@ module UnitAdv
 
       end
 
-      # === === ===
+      # === === === === === === === === ===
       # Detail:
       #   目標 self method 執行結束時，呼叫下一個 method 並帶入參數，輸出 report
       #
@@ -69,12 +110,12 @@ module UnitAdv
         res
       end
 
-      # === === ===
+      # === === === === === === === === ===
       def call_method(call_sym, *args, &block)
         call(nil, call_sym, *args, &block)
       end
 
-      # === === ===
+      # === === === === === === === === ===
       def call(perfix_set, call_sym, *args, &block)
 
         if perfix_set.kind_of?(Hash)
