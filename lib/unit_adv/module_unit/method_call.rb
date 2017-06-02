@@ -13,6 +13,7 @@ module UnitAdv
 
       attr_accessor :opts
 
+
       # === === === === === === === === ===
       # Detail:
       #   依序叫出 class 的 initialize + perform
@@ -28,7 +29,7 @@ module UnitAdv
       #   opts: {
       #     namespace: "animal"
       #   }
-
+      #
       def call_perform(class_names = [], opts = {}, &block)
         opts[:namespace] ||= nil
         opts[:need_initialize] ||= true
@@ -65,6 +66,7 @@ module UnitAdv
       #       first_method: [first_method_arg1, first_method_arg2, first_method_arg3],
       #       second_method: second_method_arg1,
       #     }
+      #
       def call_api(use_api, &block)
 
         return nil if use_api[:api_obj].blank?
@@ -95,6 +97,7 @@ module UnitAdv
       #       (1.) next_call: nil # is step to end or
       #       (2.) next_call: :second_method, arg1, arg2 #  next method sym and args
       #     }
+      #
       def call_goto(*init_step, &block)
         res = {}
         tmp = {
@@ -111,24 +114,112 @@ module UnitAdv
       end
 
       # === === === === === === === === ===
+      # Detail:
+      #   依序尋找 method，有找到的話就 send（可配合 to_level 產生）
+      #
+      # Use:
+      #   call_syms:
+      #     %w(perform_by_aa_cc_xxx_ttt perform_by_aa_cc_xxx perform_by_aa_cc perform_by_aa default)
+      #
+      def call_methods(call_syms, *args, &block)
+        call_syms.map(&:to_sym).each { |m| return send(m, *args, &block) if self.respond_to?(m) }
+      end
+
+      # === === === === === === === === ===
+      # Detail:
+      #   動態取得 call 的對象
+      #
+      # Use:
+      #   call_sym_h:
+      #     -> TYPE-1
+      #     "xyz"
+      #     -> TYPE-2
+      #     {
+      #       call_sym: "xyz"
+      #       perfix: "aaa_by" # method 前綴詞
+      #       dcall: %w(hash const method) # 修改動態資料的優先順序
+      #     }
+      #     -> TYPE-3
+      #     ["xyz", "aaa_by", %w(method const hash), "_"]
+      #
+      #   Ans:(TYPE-2)
+      #     first find method: aaa_by_xyz
+      #     second find const: XYX
+      #     third find hash for DCALL_HASH_DEFAULT: opts[:xyz]
+      #
+      def call_type(call_sym_h, *args, &block)
+        _set = {
+          dcall: DCALL_PRIORITY,
+          perfix: "",
+          split: "_",
+        }
+
+        case call_sym_h.class.name
+        when /(Hash)/
+          set = _set.merge call_sym_h
+        when /(Array)/
+          set = _set
+          set[:call_sym] = call_sym_h[0] if call_sym_h[0].present?
+          set[:perfix] = call_sym_h[1] if call_sym_h[1].present?
+          set[:split] = call_sym_h[2] if call_sym_h[2].present?
+          set[:dcall] = call_sym_h[3] if call_sym_h[3].present?
+        when /(String)/
+          set = _set
+          set[:call_sym] = call_sym_h if call_sym_h.present?
+        else
+        end
+
+        set[:dcall].each_with_object(nil) do |r, z|
+          case r
+          when 'method'
+            m = set[:call_sym].remove(opts[:prefix]).split(opts[:split]).compact.unshift(set[:perfix]).join(opts[:split])
+            z = send_method(m, *args, &block)
+          when 'const'
+            z = const_get(set[:call_sym])
+          when 'hash'
+            z = hash_fetch(set[:call_sym])
+          end
+          return z if !z.nil?
+        end
+        nil
+      end
+
+
+      # === === === === === === === === ===
+      # Memo:
+      #   old version
+      #
       def call_method(call_sym, *args, &block)
         call(nil, call_sym, *args, &block)
       end
 
       # === === === === === === === === ===
-      def call(perfix_set, call_sym, *args, &block)
-
-        if perfix_set.kind_of?(Hash)
-          perfix = perfix_set[:perfix]
-          dcall_priority = perfix_set[:dcall]
-        else
-          perfix = perfix_set
-        end
-        dcall_priority ||= self.class::DCALL_PRIORITY
-
+      # Memo:
+      #   old version
+      #
+      # Detail:
+      #   動態取得 call 的對象
+      #
+      # Use:
+      #   prefix_set:
+      #     -> TYPE-1
+      #     {
+      #       perfix: "aaa" # method 前綴詞
+      #       dcall: %w(hash const method) # 修改動態資料的優先順序
+      #     }
+      #     -> TYPE-2
+      #     "bbb"
+      #   call_sym:
+      #     -> TYPE-1 多種型態尋找 (hash const method)
+      #     "ccc_method"
+      #     -> TYPE-2 階層式尋找（只限method）
+      #     ["method_ccc_ddd_eee", "method_ccc_ddd", "method_ccc"]
+      #
+      def call(prefix_set, call_sym, *args, &block)
+        set = call_prefix_set(prefix_set)
         z = nil
-        m = call_sym.kind_of?(Array) ? use_method_name(perfix, call_sym) : method_name(perfix, call_sym)
-        dcall_priority.each do |r|
+        m = call_sym.kind_of?(Array) ? multi_method_name(set[:perfix], call_sym) : method_name(set[:perfix], call_sym)
+        set[:dcall].each do |r|
           case r
           when 'method'
             z = send_method(m, *args, &block)
@@ -151,8 +242,20 @@ module UnitAdv
       end
 
       # Type2: method_name 多選一
-      def use_method_name(perfix, call_syms)
+      def multi_method_name(perfix, call_syms)
         call_syms.each_with_object("") { |m, x| return x if self.respond_to?(x = method_name(perfix, m)) }
+      end
+
+      # === === ===
+      # Get Dynamic Type Priority
+      def call_prefix_set(set)
+
+        return { perfix: set[:perfix], dcall: set[:dcall] } if prefix_set.kind_of?(Hash)
+
+        {
+          perfix: set,
+          dcall: self.class::DCALL_PRIORITY,
+        }
       end
 
       # === === ===
@@ -173,7 +276,8 @@ module UnitAdv
       # Dynamic Get Hash
       def hash_fetch(key)
         hash_opts = self.send(DCALL_HASH_DEFAULT) || {}
-        hash_opts.fetch(key.to_sym, nil) if self.respond_to?(DCALL_HASH_DEFAULT.to_sym)
+        return hash_opts.fetch(key.to_sym, nil) if self.respond_to?(DCALL_HASH_DEFAULT.to_sym)
+        nil
       end
 
     end

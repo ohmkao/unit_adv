@@ -42,42 +42,6 @@ module UnitAdv
           h = gsub_data if gsub_data.kind_of?(Hash)
           str.gsub(Regexp.new("(#{h.keys.join('|')})"), h)
         end
-
-        # === === ===
-        def to_bool(data, opts = nil)
-          case data.class.name
-          when /(Hash|Array)/
-            return false if data.blank?
-            return true
-          when /(String)/
-            str = data.downcase
-            return false if ['false', '0', 'no', 'off', 'f', ''].include? str
-            return true if ['true', '1', 'yes', 'on', 't'].include? str
-            return nil
-          when /(Integer|Fixnum)/
-            return false if data.zero?
-            return true
-          when /(FalseClass|TrueClass)/
-            return data
-          else
-            return nil
-          end
-        end
-
-        def to_arr(data, opts = nil)
-          return data if data.kind_of?(Array)
-          [data]
-        end
-
-        def to_level(arr, opts = {})
-          tmp = []
-          tmp += opts[:arr_first] if opts[:arr_first].kind_of?(Array)
-          tmp << opts[:arr_first] if opts[:arr_first].kind_of?(String)
-          for i in 1..arr.count
-            tmp << arr[0..(i-1)].join('_')
-          end
-          tmp.reverse
-        end
       end
 
       def run_command(commands)
