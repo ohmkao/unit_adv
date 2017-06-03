@@ -225,7 +225,7 @@ module UnitAdv
             z = send_method(m, *args, &block)
             return z if call_sym.kind_of?(Array)
           when 'const'
-            z = const_get(call_sym) if const_defined?(call_sym.upcase.to_sym)
+            z = const_fetch(call_sym)
           when 'hash'
             z = hash_fetch(call_sym)
           end
@@ -267,7 +267,7 @@ module UnitAdv
       end
 
       # Dynamic Get Const
-      def const_get(const_name)
+      def const_fetch(const_name)
         c = const_name.to_s.upcase
         return self.class.const_get(c) if self.class.const_defined?(c)
         nil
