@@ -60,24 +60,22 @@ module UnitAdv
       #   呼叫 api 模式，以 api class，在 class 內依序呼叫 method
       #
       # Use:
+      #   class_obj: XxxYyyApi
       #   use_api: {
-      #       api_obj: XxxYyyApi,
       #       init: [new_arg1, new_arg2], # this is Object new
       #       first_method: [first_method_arg1, first_method_arg2, first_method_arg3],
       #       second_method: second_method_arg1,
       #     }
       #
-      def call_api(use_api, &block)
+      def call_api(class_obj, use_args, &block)
 
-        return nil if use_api[:api_obj].blank?
+        obj_c = class_obj.kind_of?(String) ? class_obj.constantize : class_obj
+        obj = use_args[:init].present? ? obj_c.new(*use_args[:init]) : obj_c.new
 
-        api_obj_c = use_api[:api_obj].kind_of?(String) ? use_api[:api_obj].constantize : use_api[:api_obj]
-        api_obj = use_api[:init].present? ? api_obj_c.new(*use_api[:init]) : api_obj_c.new
-
-        use_api.except(:api_obj, :init).each_with_object({}) do |(sym, args), m|
-          res_tmp = api_obj.send(sym, *(args.kind_of?(Array) ? args : [args] ))
+        use_args.except(:init).each_with_object({}) do |(sym, args), m|
+          res_tmp = obj.send(sym, *(args.kind_of?(Array) ? args : [args] ))
           m.merge!({ sym => (block_given? ? yield(sym, res_tmp) : res_tmp) })
-        end.merge!({ api_obj: api_obj })
+        end.merge!({ obj: obj })
 
       end
 

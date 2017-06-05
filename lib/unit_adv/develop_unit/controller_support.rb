@@ -8,12 +8,28 @@ module UnitAdv
       def init_controller(data = {})
         self.controller_data = {
           obj: arg_controller_obj,
-          stdout: nil,
-          status: nil,
-          content_type: nil,
+          params: fetch_params
+          tpl: nil, # 輸出樣板
+          stdout: nil, # 輸出緩衝
+          status: nil, # 結果狀態
+          content_type: nil, #
+          filename: nil, # 檔名 (only for file download)
+          disposition: nil, # inline or attachment (only for file download)
         }.merge(data)
       end
 
+      # === === ===
+      def fetch_controller
+        return arg_controller_obj if self.respond_to?("arg_controller_obj")
+        nil
+      end
+
+      def fetch_params
+        return arg_controller_obj.params if self.respond_to?("arg_controller_obj")
+        nil
+      end
+
+      # === === ===
       def render_view
 
       end
@@ -21,7 +37,7 @@ module UnitAdv
       # === === ===
       def render_by_html
         [
-
+          controller_data[:tpl]
         ]
       end
 
@@ -33,17 +49,21 @@ module UnitAdv
 
       def render_by_text
         [
-          test: controller_data[:stdout]
+          text: controller_data[:stdout].to_s
         ]
       end
 
       def render_by_file
+
+        file_opt = {}
+        file_opt[:filename] =
+
         [
           controller_data[:stdout],
           {
-            filename: "#{params[:script]}.#{params[:format]}",
-            disposition: 'attachment',
-            type: ( params[:format].present? ? params[:format].to_sym : 'text/plain')
+            filename: (controller_data[:filename] || "#{controller_data[:params][:script]}.#{controller_data[:params][:format]}"),
+            disposition: (controller_data[:disposition] || 'attachment'),
+            type: (content_type[:content_type] || ( params[:format].present? ? params[:format].to_sym : 'text/plain'))
           },
         ]
       end

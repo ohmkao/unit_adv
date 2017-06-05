@@ -62,7 +62,7 @@ module UnitAdv
         #     arr_default: "defalut" # 放在最後一個(不加入prefix詞)
         #
         # Example:
-        #   -> to_level "perform_by_aa_cc_xxx_ttt", { prefix: "perform_by", arr_first: "default" }
+        #   -> to_level "perform_by_aa_cc_xxx_ttt", { prefix: "perform_by", arr_default: "default" }
         #   return:
         #     ["perform_by_aa_cc_xxx_ttt", "perform_by_aa_cc_xxx", "perform_by_aa_cc", "perform_by_aa", "default"]
         #
