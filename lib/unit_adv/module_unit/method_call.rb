@@ -57,17 +57,17 @@ module UnitAdv
 
       # === === === === === === === === ===
       # Detail:
-      #   呼叫 api 模式，以 api class，在 class 內依序呼叫 method
+      #   呼叫 class 模式，在 class 內依序呼叫 method
       #
       # Use:
       #   class_obj: XxxYyyApi
-      #   use_api: {
+      #   use_class: {
       #       init: [new_arg1, new_arg2], # this is Object new
       #       first_method: [first_method_arg1, first_method_arg2, first_method_arg3],
       #       second_method: second_method_arg1,
       #     }
       #
-      def call_api(class_obj, use_args, &block)
+      def call_class(class_obj, use_args, &block)
 
         obj_c = class_obj.kind_of?(String) ? class_obj.constantize : class_obj
         obj = use_args[:init].present? ? obj_c.new(*use_args[:init]) : obj_c.new
