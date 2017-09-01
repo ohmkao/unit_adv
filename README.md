@@ -1,22 +1,19 @@
 # UnitAdv
 
-...
+Easy use provide a logical method for self code
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'unit_adv'
+gem 'unit_adv', tag: "v0.5", git: "https://github.com/ohmkao/unit_adv.git"
 ```
 
 And then execute:
 
-    $ bundle
+    $ bundle install
 
-Or install it yourself as:
-
-    $ gem install unit_adv
 
 ## Usage
 
@@ -31,8 +28,4 @@ end
 
 ## Development
 
-...
-
-## Contributing
-
-...
+See unit_adv/example/
