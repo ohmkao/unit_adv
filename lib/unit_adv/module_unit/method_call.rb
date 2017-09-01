@@ -13,6 +13,42 @@ module UnitAdv
 
       attr_accessor :opts
 
+      # === === === === === === === === ===
+      # Detail:
+      #   取得相同 method name perfix，回傳的 method
+      #   ignore >> 若特定的值，則忽略（預設 nil）
+      #
+      # Use:
+      #   match_perfix: "xxx"
+      #   ignore: :pass_return
+      #
+      #   return: {
+      #     aaa: "AAAxyz",
+      #     bbb: "Mnnn",
+      #     ddd: [123, 999],
+      #   }
+      #
+      #   def xxx_aaa
+      #     "AAAxyz"
+      #   end
+      #
+      #   def xxx_bbb
+      #     "Mnnn"
+      #   end
+      #
+      #   def xxx_bbb
+      #     :pass_return
+      #   end
+      #
+      #   def xxx_ddd
+      #     [123, 999]
+      #   end
+      def call_method_for_hash(match_perfix, ignore = nil)
+        self.class.instance_methods.select{ |m| m =~  Regexp.new("^(#{match_perfix}).*") }.each_with_object({}) do |m, h|
+          tmp = send(m)
+          h[m.to_s.gsub("#{match_perfix}_", "")] = tmp if tmp != ignore
+        end
+      end
 
       # === === === === === === === === ===
       # Detail:
@@ -20,12 +56,12 @@ module UnitAdv
       #
       # Use:
       #   class_names: [
-      #       "cat",
-      #       "dog",
-      #       ["pig", "kg", 5],
-      #       "sheep",
-      #       "chicken#perform_ex",
-      #     ]
+      #     "cat",
+      #     "dog",
+      #     ["pig", "kg", 5],
+      #     "sheep",
+      #     "chicken#perform_ex",
+      #   ]
       #   opts: {
       #     namespace: "animal"
       #   }
@@ -125,7 +161,7 @@ module UnitAdv
 
       # === === === === === === === === ===
       # Detail:
-      #   動態取得 call 的對象
+      #   動態取得 call 的對象（method const hash）
       #
       # Use:
       #   call_sym_h:

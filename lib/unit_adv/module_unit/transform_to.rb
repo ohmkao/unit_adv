@@ -72,8 +72,9 @@ module UnitAdv
           tmp = []
           tmp += opts[:arr_default] if opts[:arr_default].kind_of?(Array)
           tmp << opts[:arr_default] if opts[:arr_default].kind_of?(String)
+          prefix = opts[:prefix].present? ? [opts[:prefix]] : []
           for i in 1..data.count
-            tmp << (([opts[:prefix]] || []) + data[0..(i-1)]).join('_')
+            tmp << (prefix + data[0..(i-1)]).join('_')
           end
           tmp.reverse
         end
