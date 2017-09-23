@@ -284,7 +284,7 @@ module UnitAdv
       # Get Dynamic Type Priority
       def call_prefix_set(set)
 
-        return { perfix: set[:perfix], dcall: set[:dcall] } if prefix_set.kind_of?(Hash)
+        return { perfix: set[:perfix], dcall: set[:dcall] } if set.kind_of?(Hash)
 
         {
           perfix: set,

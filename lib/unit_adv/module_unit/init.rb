@@ -85,7 +85,8 @@ module UnitAdv
             return tmp
           end
         end
-        Exception.new("UnitAdv::Error: #{method_sym}")
+
+        super
       end
 
       def method_missing_slice(method_name)
