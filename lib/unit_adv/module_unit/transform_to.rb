@@ -79,6 +79,25 @@ module UnitAdv
           tmp.reverse
         end
 
+        # dev
+        def to_obj(ids ,opts = {})
+          _opts = {
+            model_name: nil,
+            column_name: :id,
+          }.merge! opts
+
+          case opts[:model_name].class.name
+          when "Class"
+            model_class = opts[:model_name]
+          when "String"
+            model_class = opts[:model_name].classify.constantize
+          else
+            raise Exception.new("UnitAdv::Error:: opts[:model_name] is #{opts[:model_name]}")
+          end
+
+          model_class.where(opts[:column_name] => ids.flatten)
+        end
+
       end
     end
   end
